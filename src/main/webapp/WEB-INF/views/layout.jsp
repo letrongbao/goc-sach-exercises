@@ -3,6 +3,7 @@
 <!doctype html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mộc Sách · Một trang sách, một chân trời</title>
 <link rel="stylesheet" href="<c:url value='/assets/bootstrap.min.css'/>"><link rel="stylesheet" href="<c:url value='/assets/app.css'/>">
+<link rel="stylesheet" href="<c:url value='/assets/typography.css'/>">
 </head><body>
 <div class="topline">MỘC SÁCH JOURNAL <span>Chậm lại một chút, đọc thêm một trang.</span></div>
 <header class="site-header"><a class="brand" href="<c:url value='/'/>">mộc<span>sách.</span></a>

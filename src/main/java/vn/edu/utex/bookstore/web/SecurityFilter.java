@@ -21,7 +21,7 @@ public final class SecurityFilter implements Filter {
         res.setHeader("X-Content-Type-Options","nosniff"); res.setHeader("X-Frame-Options","DENY");
         res.setHeader("Referrer-Policy","same-origin");
         res.setHeader("Content-Security-Policy","default-src 'self'; style-src 'self'; img-src 'self' https: http: data:; script-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'self'");
-        String path = req.getRequestURI().substring(req.getContextPath().length());
+        String path = req.getServletPath() + (req.getPathInfo() == null ? "" : req.getPathInfo());
         if (path.startsWith("/assets/") || path.startsWith("/media/")) { chain.doFilter(req,res); return; }
         res.setHeader("Cache-Control","no-store");
         App app = (App)req.getServletContext().getAttribute("app");

@@ -10,6 +10,11 @@ import java.util.*;
 import vn.edu.utex.bookstore.auth.*;
 import vn.edu.utex.bookstore.config.*;
 class WebTest {
+    @Test void normalizedAdminPathsCannotBypassAuthorization() throws Exception {
+        for(String path:List.of("/admin;ignored/categories","/%61dmin/categories")) {
+            var response=get(path);assertEquals(302,response.statusCode(),path+response.body());
+        }
+    }
     private Tomcat tomcat;
     private HttpClient client;
     private String base;

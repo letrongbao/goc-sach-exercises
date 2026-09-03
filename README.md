@@ -16,6 +16,10 @@ Windows: `./mvnw.cmd clean verify`. Linux/macOS: `./mvnw clean verify`.
 WAR: `target/bookstore.war`. Triển khai vào Tomcat 10.1 và mở `/bookstore/`.
 Test mặc định không kết nối PostgreSQL, không thực thi SQL và không gửi Gmail.
 
+## Bản sửa an toàn
+
+Bản giao hiện tại dùng tag submission-01-r1: bổ sung xử lý URL quản trị đã chuẩn hóa và sửa font tiếng Việt. Tag submission-01 gốc chỉ giữ để đối chiếu, không dùng để nộp.
+
 ## Bản nộp
 
 `submission-01` → JDBC; `submission-02` → JPA; `submission-03` → JPA + OTP + sản phẩm.
