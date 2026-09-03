@@ -1,9 +1,9 @@
 # Cài đặt và chạy
 
 1. Cài Java 21, PostgreSQL 17 và Tomcat 10.1. Dùng PostgreSQL 17.11 theo kế hoạch; không thay database các dự án khác.
-2. Chủ project tự tạo database `bookstore_02`, đọc rồi tự chạy `sql/schema.sql`. Ứng dụng không chạy file SQL. Nếu tiếp tục dùng schema Bài 01 đã có thì chỉ đổi kết nối, tuyệt đối không chạy lại CREATE TABLE.
+2. Chủ project tự tạo database `bookstore_03`, đọc rồi tự chạy `sql/schema.sql`. Nếu tiếp tục database Bài 02 có sẵn, chỉ đọc và tự thực thi `sql/upgrade-02-to-03.sql`. Chọn đúng MỘT cách, không chạy cả hai. Ứng dụng không thực thi SQL/schema/migration.
 3. Build project rồi chạy `./scripts/hash-password.ps1` trong PowerShell thật (nhập ẩn qua console; không đặt mật khẩu trên command line). Thay placeholder trong `sql/demo.sql` rồi tự thực thi trên DB demo.
-4. Sao chép `config/local.example.properties` thành `config/local.properties`, điền thông tin riêng. Không commit file này.
+4. Sao chép `config/local.example.properties` thành `config/local.properties`, điền PostgreSQL và `otp.secret` ngẫu nhiên ít nhất 32 byte. Mailpit dùng SMTP local; để dùng Gmail đọc docs/OTP.md và mẫu gmail.example.properties. Không commit file cấu hình riêng.
 5. Cấu hình Tomcat với JVM option `-Dbookstore.config=C:/BaoLT/spring_boot/config/local.properties`.
 6. Chạy `./mvnw.cmd clean verify`; chép `target/bookstore.war` vào thư mục `webapps` của Tomcat. Mở `http://localhost:8080/bookstore/`.
 

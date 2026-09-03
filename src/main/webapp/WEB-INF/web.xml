@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd" version="6.0">
   <display-name>Mộc Sách</display-name>
+  <servlet><servlet-name>otp</servlet-name><servlet-class>vn.edu.utex.bookstore.web.OtpServlet</servlet-class></servlet>
+  <servlet-mapping><servlet-name>otp</servlet-name><url-pattern>/auth/register</url-pattern><url-pattern>/auth/activate</url-pattern><url-pattern>/auth/resend</url-pattern><url-pattern>/auth/forgot</url-pattern><url-pattern>/auth/reset</url-pattern></servlet-mapping>
+  <servlet><servlet-name>product</servlet-name><servlet-class>vn.edu.utex.bookstore.web.ProductServlet</servlet-class>
+    <multipart-config><max-file-size>5242880</max-file-size><max-request-size>6291456</max-request-size><file-size-threshold>1048576</file-size-threshold></multipart-config>
+  </servlet>
+  <servlet-mapping><servlet-name>product</servlet-name><url-pattern>/product</url-pattern><url-pattern>/product/detail</url-pattern><url-pattern>/admin/products</url-pattern><url-pattern>/admin/product/add</url-pattern><url-pattern>/admin/product/edit</url-pattern><url-pattern>/admin/product/save</url-pattern><url-pattern>/admin/product/delete</url-pattern></servlet-mapping>
   <listener><listener-class>vn.edu.utex.bookstore.web.Bootstrap</listener-class></listener>
   <filter><filter-name>security</filter-name><filter-class>vn.edu.utex.bookstore.web.SecurityFilter</filter-class></filter>
   <filter-mapping><filter-name>security</filter-name><url-pattern>/*</url-pattern></filter-mapping>
