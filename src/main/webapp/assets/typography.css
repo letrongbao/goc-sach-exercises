@@ -1,0 +1,2 @@
+/* Keep Vietnamese stacked diacritics together on Windows. */
+.brand, h1, h2, h3, .cover, .auth-story blockquote { font-family: "Times New Roman", Times, serif; }
