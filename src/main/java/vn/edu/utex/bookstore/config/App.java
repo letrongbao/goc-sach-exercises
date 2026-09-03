@@ -17,6 +17,6 @@ public final class App implements AutoCloseable {
         this.categories = new CategoryService(store); this.images = new LocalImageStorage(Path.of(settings.require("uploads.dir")));
         this.limits = new RateLimiter(clock);
     }
-    public static App create() { Settings s = Settings.load(); return new App(s,new JdbcStore(s),Clock.systemUTC()); }
+    public static App create() { Settings s = Settings.load(); return new App(s,new JpaStore(s),Clock.systemUTC()); }
     public void close() { store.close(); }
 }

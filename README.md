@@ -1,6 +1,6 @@
-# Mộc Sách — Bài 01: Servlet/JDBC
+# Mộc Sách — Bài 02: Servlet/JPA
 
-Ứng dụng bán sách phát triển tuần tự cho môn Lập trình Web. Bản này có đăng nhập Session/Cookie và CRUD danh mục. Chưa có Spring Boot, OTP hay sản phẩm.
+Ứng dụng bán sách phát triển tuần tự cho môn Lập trình Web. Bản này có đăng nhập Session/Cookie và CRUD danh mục, toàn bộ truy cập dữ liệu bằng JPA EntityManager. Đọc docs/JPA.md để đối chiếu Bài 01. Chưa có Spring Boot, OTP hay sản phẩm.
 
 ## Quy tắc trước khi chạy
 
