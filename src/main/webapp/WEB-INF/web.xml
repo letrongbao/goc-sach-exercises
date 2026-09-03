@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd" version="6.0">
+  <display-name>Mộc Sách</display-name>
+  <listener><listener-class>vn.edu.utex.bookstore.web.Bootstrap</listener-class></listener>
+  <filter><filter-name>security</filter-name><filter-class>vn.edu.utex.bookstore.web.SecurityFilter</filter-class></filter>
+  <filter-mapping><filter-name>security</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+  <servlet><servlet-name>front</servlet-name><servlet-class>vn.edu.utex.bookstore.web.FrontServlet</servlet-class>
+    <multipart-config><max-file-size>5242880</max-file-size><max-request-size>6291456</max-request-size><file-size-threshold>1048576</file-size-threshold></multipart-config>
+  </servlet>
+  <servlet-mapping><servlet-name>front</servlet-name><url-pattern></url-pattern><url-pattern>/auth/*</url-pattern><url-pattern>/admin/*</url-pattern><url-pattern>/media/*</url-pattern></servlet-mapping>
+  <session-config><session-timeout>30</session-timeout><cookie-config><http-only>true</http-only></cookie-config><tracking-mode>COOKIE</tracking-mode></session-config>
+  <error-page><error-code>403</error-code><location>/WEB-INF/views/forbidden.jsp</location></error-page>
+</web-app>
