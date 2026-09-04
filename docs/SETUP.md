@@ -1,20 +1,23 @@
-# Cài đặt và chạy
+# Cách chạy
 
-1. Cài Java 21, PostgreSQL 17 và Tomcat 10.1. Dùng PostgreSQL 17.11 theo kế hoạch; không thay database các dự án khác.
-2. Chủ project tự tạo database `bookstore_03`, đọc rồi tự chạy `sql/schema.sql`. Nếu tiếp tục database Bài 02 có sẵn, chỉ đọc và tự thực thi `sql/upgrade-02-to-03.sql`. Chọn đúng MỘT cách, không chạy cả hai. Ứng dụng không thực thi SQL/schema/migration.
-3. Build project rồi chạy `./scripts/hash-password.ps1` trong PowerShell thật (nhập ẩn qua console; không đặt mật khẩu trên command line). Thay placeholder trong `sql/demo.sql` rồi tự thực thi trên DB demo.
-4. Sao chép `config/local.example.properties` thành `config/local.properties`, điền PostgreSQL và `otp.secret` ngẫu nhiên ít nhất 32 byte. Mailpit dùng SMTP local; để dùng Gmail đọc docs/OTP.md và mẫu gmail.example.properties. Không commit file cấu hình riêng.
-5. Cấu hình Tomcat với JVM option `-Dbookstore.config=C:/BaoLT/spring_boot/config/local.properties`.
-6. Chạy `./mvnw.cmd clean verify`; chép `target/bookstore.war` vào thư mục `webapps` của Tomcat. Mở `http://localhost:8080/bookstore/`.
+Cần Java 21, PostgreSQL 17 và Tomcat 10.1.
 
-Maven Wrapper tải Maven/dependency ở lần đầu. Java có sẵn, không cần cài Maven toàn máy. Production dùng HTTPS và `cookie.secure=true`. Session timeout 30 phút, Cookie ghi nhớ 7 ngày.
+1. Tạo database riêng. Với database mới, đọc và chạy `sql/schema.sql`. Nếu dùng tiếp database Bài 02, chỉ chạy `sql/upgrade-02-to-03.sql`. Không chạy cả hai.
+2. Điền cấu hình theo [hướng dẫn](CAU_HINH.md).
+3. Tại thư mục project, chạy `mvnw.cmd clean verify`.
+4. Thêm tùy chọn Java cho Tomcat bên dưới, sửa đường dẫn theo máy.
+5. Chép `target/bookstore.war` vào thư mục `webapps` của Tomcat và khởi động Tomcat.
 
-Ảnh upload nằm ngoài WAR theo `uploads.dir`, không bị mất khi redeploy. Không chạy nhiều bản demo dùng chung thư mục ảnh/database. Chưa có tác vụ tự xóa ảnh cũ; giữ file để tránh xóa nhầm ảnh còn được tham chiếu.
+```text
+-Dbookstore.config=C:/BaoLT/spring_boot/config/local.properties
+```
 
-## Kịch bản demo Bài 01
+Mở [website trên máy](http://localhost:8080/bookstore/).
 
-Đăng nhập bằng Session → CRUD danh mục → đăng xuất → đăng nhập bằng Cookie → xóa riêng JSESSIONID và tải lại (vẫn đăng nhập bằng token) → đăng xuất (token hết hiệu lực). Dùng tài khoản USER mở `/admin/categories` phải nhận 403. Cookie không chứa mật khẩu/username làm bằng chứng đăng nhập.
+## Dữ liệu demo
 
-## Kiểm thử tích hợp
+Sau khi build, chạy `scripts/hash-password.ps1` để tạo mật khẩu đã mã hóa. Điền kết quả vào chỗ trống trong `sql/demo.sql`, kiểm tra rồi chạy trên database demo. Không chạy lại schema nếu đã có bảng.
 
-Chỉ chạy trên schema đã được người dùng tạo thủ công. Test mặc định sử dụng repository giả; không xem đây là bằng chứng PostgreSQL hoạt động. Không dùng H2/Testcontainers tự tạo bảng.
+Ảnh tải lên được lưu ở đường dẫn `uploads.dir` trong cấu hình. Giữ thư mục này khi cập nhật ứng dụng.
+
+Ứng dụng và kiểm thử không tự tạo bảng. Không dùng database của dự án khác.
