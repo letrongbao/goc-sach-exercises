@@ -1,7 +1,7 @@
-# Góc Sách — Bài tập Lập trình Web
+# Bài tập Lập trình Web
 
 Sinh viên: Lê Trọng Bảo
-
+MSSV: 22110106
 Đề tài: Website bán sách.
 
 ## Bài 03
@@ -20,7 +20,4 @@ Bài làm sử dụng Java, JSP và JPA với PostgreSQL.
 
 - [Cách chạy](docs/SETUP.md)
 - [Cách điền cấu hình](docs/CAU_HINH.md)
-- [Link và hướng dẫn nộp Bài 03](docs/SUBMISSIONS.md)
 - [Kết quả kiểm tra](docs/VERIFICATION.md)
-
-Repo này dành cho bài tập. Đồ án cuối kỳ được phát triển riêng.
