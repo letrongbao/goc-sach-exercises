@@ -1,5 +1,9 @@
 # Kết quả xác minh — cập nhật 04/09/2026
 
+## Cập nhật 11:21 — PostgreSQL/Gmail
+
+Xem [LIVE_CHECK.md](LIVE_CHECK.md): kiểm thử tích hợp thật đã PASS. Các mô tả thiếu cấu hình/không chạy SQL bên dưới là ghi nhận lịch sử trước 11:07, không còn là trạng thái hiện tại. Schema đã được chạy một lần trên database demo trống theo yêu cầu trực tiếp của chủ project; ứng dụng vẫn chỉ validate, không tự tạo bảng.
+
 ## Bản sửa submission-03-r1
 
 `mvnw.cmd -B -ntp -o verify`: **61/61 PASS**, BUILD SUCCESS sau sửa. CoreTest 14; ImageTest 7; JpaTransactionTest 3; OtpTest 11; ProductTest 14; SmtpTest 2; WebTest 10. Không failures/errors/skipped. [Chi tiết thay đổi và giới hạn](FIXES.md).
