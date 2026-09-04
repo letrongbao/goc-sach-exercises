@@ -10,6 +10,12 @@ Rate limit 10 lần gửi / IP / 15 phút và 3 lần / email / 15 phút; xác m
 
 ## Mailpit
 
+### Phản hồi khi gửi email thất bại
+
+`OtpDeliveryFailure` phân biệt lỗi gửi mã với validation. Đăng ký mới vẫn báo 503 để người dùng biết tài khoản đang chờ kích hoạt. Hai endpoint công khai `/auth/forgot` và `/auth/resend` giữ cùng status/điều hướng/thông báo tổng quát cho email có/không tồn tại, kể cả SMTP lỗi hoặc đang cooldown. Không log email, OTP hoặc exception từ nhà cung cấp; chỉ ghi thông báo vận hành cố định.
+
+Challenge gửi thất bại vẫn bị vô hiệu hóa, không được kích hoạt/reset; gửi lại sau cooldown tạo mã mới. Thay đổi này sửa khác biệt status/nội dung, **chưa loại bỏ khác biệt thời gian do SMTP đồng bộ**. Cần queue/shared rate limiter trước môi trường production.
+
 Tự chạy Mailpit riêng, SMTP 127.0.0.1:1025, UI 127.0.0.1:8025. config/local.example.properties trỏ vào SMTP này; không gửi ra Gmail. Không tự khởi động Docker/PostgreSQL hoặc tự tạo schema.
 
 ## Gmail

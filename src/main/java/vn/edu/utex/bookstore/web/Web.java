@@ -22,6 +22,24 @@ public final class Web {
     return raw == null || raw.isBlank() ? null : id(raw);
   }
 
+  public static Long positiveIdOrNull(String raw) {
+    if (raw == null || !raw.matches("[0-9]{1,19}")) return null;
+    try {
+      long value = Long.parseLong(raw);
+      return value > 0 ? value : null;
+    } catch (NumberFormatException e) {
+      return null;
+    }
+  }
+
+  public static Long formId(String raw, boolean required) {
+    if (!required && (raw == null || raw.isBlank())) return null;
+    Long value = positiveIdOrNull(raw);
+    if (value == null)
+      throw Problem.invalid("Mã dữ liệu phải là số nguyên dương. Hãy kiểm tra lại biểu mẫu.");
+    return value;
+  }
+
   public static void view(HttpServletRequest req, HttpServletResponse res, String view)
       throws ServletException, IOException {
     req.setAttribute("view", view);

@@ -1,4 +1,14 @@
-# Kết quả xác minh — 03/09/2026
+# Kết quả xác minh — cập nhật 04/09/2026
+
+## Bản sửa submission-03-r1
+
+`mvnw.cmd -B -ntp -o verify`: **61/61 PASS**, BUILD SUCCESS sau sửa. CoreTest 14; ImageTest 7; JpaTransactionTest 3; OtpTest 11; ProductTest 14; SmtpTest 2; WebTest 10. Không failures/errors/skipped. [Chi tiết thay đổi và giới hạn](FIXES.md).
+
+Chrome xác nhận catalog ở desktop (914px nội dung), viewport 320×740 và 390×844: không tràn ngang; sáu khung bìa đều có scrollHeight bằng clientHeight. Tên dài trên phần bìa trang trí được giới hạn, tên đầy đủ bên dưới vẫn giữ nguyên. Trang 403 mới chặn đúng USER và có nút điều hướng; xem [minh chứng bản sửa](evidence/fixes/README.md).
+
+Chạy lại ngày 04/09/2026 lúc 10:04 (UTC+7): 61/61 PASS, BUILD SUCCESS. Các kết quả trong bảng dưới là **snapshot cũ**, không đại diện cho source đã sửa. Tag/folder export cũ vẫn được giữ nguyên; chưa kiểm thử PostgreSQL/Gmail thật.
+
+## Các snapshot đã chốt trước lượt sửa
 
 | Bản giao | Build WAR | Test tự động | Phạm vi |
 |---|---|---|---|
@@ -22,7 +32,7 @@ Bài 03: CoreTest 14; ImageTest 7; JpaTransactionTest 3; OtpTest 10; ProductTest
 
 1. PostgreSQL thật: chưa có database/schema được người dùng chuẩn bị và cấu hình cấp cho ứng dụng. Do đó chưa xác minh CRUD/SQL/FK/locking/rollback/restart persistence trên PostgreSQL.
 2. Gmail thật: chưa có App Password và mailbox cấu hình. Chưa xác minh inbox/spam, khả năng gửi, kích hoạt/reset qua Gmail.
-3. GitHub/UTEx: chưa tạo remote, push hoặc nộp bài. Chưa có link repository thật để nộp.
+3. GitHub/UTEx: đã tạo hai repository Private (xem REPOSITORIES.md); việc tạo repo không chứng minh source đã được push. Kiểm tra SHA remote và quyền người chấm trước khi nộp. Chưa nộp bài lên UTEx.
 
 Không có file SQL, DDL, migration hay chế độ tự tạo bảng nào được chạy. Các tag là snapshot source đã build/test trong phạm vi nêu trên, chưa phải nghiệm thu end-to-end bằng PostgreSQL/Gmail.
 

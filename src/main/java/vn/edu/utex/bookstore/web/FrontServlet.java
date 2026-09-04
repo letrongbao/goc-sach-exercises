@@ -5,6 +5,7 @@ import jakarta.servlet.http.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.*;
 import vn.edu.utex.bookstore.auth.*;
 import vn.edu.utex.bookstore.category.Category;
 import vn.edu.utex.bookstore.common.Problem;
@@ -81,7 +82,7 @@ public final class FrontServlet extends HttpServlet {
       }
       if (path.equals("/admin/category/save") && post) {
         app.categories.save(
-            Web.optionalId(req.getParameter("id")),
+            Web.formId(req.getParameter("id"), false),
             req.getParameter("name"),
             image(req, app),
             "on".equals(req.getParameter("active")));
@@ -89,7 +90,7 @@ public final class FrontServlet extends HttpServlet {
         return;
       }
       if (path.equals("/admin/category/delete") && post) {
-        app.categories.delete(Web.id(req.getParameter("id")));
+        app.categories.delete(Web.formId(req.getParameter("id"), true));
         Web.redirect(req, res, "/admin/categories");
         return;
       }
@@ -104,12 +105,11 @@ public final class FrontServlet extends HttpServlet {
       req.setAttribute("error", e.getMessage());
       if (post && path.equals("/auth/login")) Web.view(req, res, "login");
       else if (post && path.equals("/admin/category/save")) {
-        Category c = new Category();
-        c.id = Web.optionalId(req.getParameter("id"));
-        c.name = req.getParameter("name");
-        c.image = req.getParameter("image");
-        c.active = "on".equals(req.getParameter("active"));
-        req.setAttribute("category", c);
+        Map<String, Object> form = new HashMap<>();
+        for (String key : List.of("id", "name", "image"))
+          form.put(key, Objects.toString(req.getParameter(key), ""));
+        form.put("active", "on".equals(req.getParameter("active")));
+        req.setAttribute("category", form);
         Web.view(req, res, "category-form");
       } else Web.view(req, res, "error");
     } catch (IllegalStateException e) {

@@ -35,15 +35,19 @@ public final class ProductServlet extends HttpServlet {
         return;
       }
       if (!post && (path.equals("/admin/product/add") || path.equals("/admin/product/edit"))) {
-        req.setAttribute(
-            "product",
-            path.endsWith("/edit") ? app.products.get(Web.id(req.getParameter("id"))) : Map.of());
+        if (path.endsWith("/edit")) {
+          var product = app.products.get(Web.id(req.getParameter("id")));
+          req.setAttribute("product", product);
+          req.setAttribute("selectedCategoryId", product.categoryId());
+        } else req.setAttribute("product", Map.of());
         req.setAttribute("categories", app.categories.list(""));
         Web.view(req, res, "product-form");
         return;
       }
       if (post && path.equals("/admin/product/save")) {
-        String image = app.images.validateReference(req.getParameter("image"));
+        Long id = Web.formId(req.getParameter("id"), false);
+        long categoryId = Web.formId(req.getParameter("categoryId"), true);
+        String image;
         Part file =
             req.getContentType() != null && req.getContentType().startsWith("multipart/form-data")
                 ? req.getPart("upload")
@@ -52,9 +56,10 @@ public final class ProductServlet extends HttpServlet {
           try (var input = file.getInputStream()) {
             image = app.images.store(input, file.getSize());
           }
+        else image = app.images.validateReference(req.getParameter("image"));
         app.products.save(
-            Web.optionalId(req.getParameter("id")),
-            Web.id(req.getParameter("categoryId")),
+            id,
+            categoryId,
             req.getParameter("title"),
             req.getParameter("author"),
             req.getParameter("description"),
@@ -65,7 +70,7 @@ public final class ProductServlet extends HttpServlet {
         return;
       }
       if (post && path.equals("/admin/product/delete")) {
-        app.products.delete(Web.id(req.getParameter("id")));
+        app.products.delete(Web.formId(req.getParameter("id"), true));
         Web.redirect(req, res, "/admin/products");
         return;
       }
@@ -80,6 +85,8 @@ public final class ProductServlet extends HttpServlet {
                 "id", "categoryId", "title", "author", "description", "price", "stock", "image"))
           form.put(key, Objects.toString(req.getParameter(key), ""));
         req.setAttribute("product", form);
+        req.setAttribute(
+            "selectedCategoryId", Web.positiveIdOrNull(req.getParameter("categoryId")));
         req.setAttribute("categories", app.categories.list(""));
         Web.view(req, res, "product-form");
       } else Web.view(req, res, "error");

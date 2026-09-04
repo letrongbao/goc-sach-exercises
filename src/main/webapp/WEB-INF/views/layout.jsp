@@ -4,6 +4,7 @@
 <title>Mộc Sách · Một trang sách, một chân trời</title>
 <link rel="stylesheet" href="<c:url value='/assets/bootstrap.min.css'/>"><link rel="stylesheet" href="<c:url value='/assets/app.css'/>">
 <link rel="stylesheet" href="<c:url value='/assets/typography.css'/>">
+<link rel="stylesheet" href="<c:url value='/assets/responsive.css'/>">
 </head><body>
 <c:if test="${applicationScope.preview}"><div class="alert alert-warning mb-0 text-center">BẢN XEM GIAO DIỆN · Dữ liệu giả trong bộ nhớ · Chưa kết nối PostgreSQL/Gmail</div></c:if>
 <div class="topline">MỘC SÁCH JOURNAL <span>Chậm lại một chút, đọc thêm một trang.</span></div>

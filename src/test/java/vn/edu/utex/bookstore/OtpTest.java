@@ -154,6 +154,27 @@ class OtpTest {
   }
 
   @Test
+  void resetDeliveryFailureCannotChangePasswordAndCanRetry() {
+    register();
+    otp.activate("reader@example.test", mail.code());
+    String originalHash = store.user(1).passwordHash;
+    mail.fail = true;
+    assertThrows(
+        OtpDeliveryFailure.class, () -> otp.issue("reader@example.test", OtpService.RESET));
+    var challenge = store.challenge(1, OtpService.RESET);
+    assertTrue(challenge.consumed);
+    assertFalse(challenge.delivered);
+    assertThrows(
+        Problem.class, () -> otp.reset("reader@example.test", "000000", password, password));
+    assertEquals(originalHash, store.user(1).passwordHash);
+    clock.now = clock.now.plusSeconds(61);
+    mail.fail = false;
+    otp.issue("reader@example.test", OtpService.RESET);
+    otp.reset("reader@example.test", mail.code(), "new-password-123", "new-password-123");
+    assertNotEquals(originalHash, store.user(1).passwordHash);
+  }
+
+  @Test
   void duplicateAndValidation() {
     assertThrows(
         Problem.class, () -> otp.register("bad@user", "x@example.test", password, password));

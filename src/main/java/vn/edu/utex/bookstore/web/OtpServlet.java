@@ -62,7 +62,7 @@ public final class OtpServlet extends HttpServlet {
           Web.redirect(req, res, "/auth/activate");
         }
         case "/auth/resend" -> {
-          app.otp.issue(email, OtpService.ACTIVATE);
+          issuePublic(app, email, OtpService.ACTIVATE);
           req.setAttribute("notice", OtpService.SENT_MESSAGE);
           Web.view(req, res, "activate");
         }
@@ -72,7 +72,7 @@ public final class OtpServlet extends HttpServlet {
           Web.redirect(req, res, "/auth/login");
         }
         case "/auth/forgot" -> {
-          app.otp.issue(email, OtpService.RESET);
+          issuePublic(app, email, OtpService.RESET);
           req.getSession().setAttribute("pendingEmail", email);
           req.getSession().setAttribute("notice", OtpService.SENT_MESSAGE);
           Web.redirect(req, res, "/auth/reset");
@@ -96,6 +96,15 @@ public final class OtpServlet extends HttpServlet {
       res.setStatus(e.status);
       req.setAttribute("error", e.getMessage());
       Web.view(req, res, view);
+    }
+  }
+
+  private void issuePublic(App app, String email, String purpose) {
+    try {
+      app.otp.issue(email, purpose);
+    } catch (OtpDeliveryFailure e) {
+      // Do not log the recipient, OTP or provider exception.
+      getServletContext().log("OTP delivery failed; inspect SMTP availability/configuration.");
     }
   }
 }

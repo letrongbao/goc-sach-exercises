@@ -26,6 +26,7 @@ class WebTest {
   private HttpClient client;
   private String base;
   private OtpTest.Mail mail;
+  private OtpTest.MutableClock clock;
 
   @BeforeEach
   void start() throws Exception {
@@ -35,6 +36,7 @@ class WebTest {
     props.setProperty("otp.secret", "test-only-secret-not-for-production-0123456789");
     MemoryStore store = DemoFixtures.store();
     mail = new OtpTest.Mail();
+    clock = new OtpTest.MutableClock();
     tomcat = new Tomcat();
     tomcat.setBaseDir("target/tomcat-test");
     tomcat.setPort(0);
@@ -42,9 +44,23 @@ class WebTest {
     var context =
         tomcat.addWebapp("/bookstore", Path.of("src/main/webapp").toAbsolutePath().toString());
     context.setParentClassLoader(getClass().getClassLoader());
+    Tomcat.addServlet(
+        context,
+        "testFailure",
+        new jakarta.servlet.http.HttpServlet() {
+          protected void doGet(
+              jakarta.servlet.http.HttpServletRequest req,
+              jakarta.servlet.http.HttpServletResponse res)
+              throws java.io.IOException {
+            if (req.getParameter("status") != null) {
+              res.sendError(Integer.parseInt(req.getParameter("status")), "internal-test-detail");
+            } else throw new IllegalStateException("internal-test-detail");
+          }
+        });
+    context.addServletMappingDecoded("/_test/failure", "testFailure");
     context
         .getServletContext()
-        .setAttribute("app", new App(new Settings(props), store, Clock.systemUTC(), mail));
+        .setAttribute("app", new App(new Settings(props), store, clock, mail));
     tomcat.start();
     base = "http://127.0.0.1:" + tomcat.getConnector().getLocalPort() + "/bookstore";
     client =
@@ -119,6 +135,193 @@ class WebTest {
 
   long countCards(String body) {
     return java.util.regex.Pattern.compile("data-product-id=").matcher(body).results().count();
+  }
+
+  void assertSafeError(HttpResponse<String> response, int expected) {
+    assertEquals(expected, response.statusCode(), response.body());
+    for (String internal :
+        List.of(
+            "Exception Report",
+            "Root Cause",
+            "NumberFormatException",
+            "internal-test-detail",
+            "vn.edu.utex.bookstore")) {
+      assertFalse(response.body().contains(internal), internal + response.body());
+    }
+  }
+
+  @Test
+  void malformedFormIdsRenderValidationWithoutLosingFields() throws Exception {
+    assertEquals(
+        302,
+        post(
+                "/auth/login",
+                "_csrf="
+                    + csrf("/auth/login")
+                    + "&login=admin&password=demo-password-123&mode=session")
+            .statusCode());
+    String token = csrf("/admin/category/add");
+    for (String invalid : List.of("abc", "0", "-1", "9223372036854775808")) {
+      var category =
+          post(
+              "/admin/category/save",
+              "_csrf=" + token + "&id=" + invalid + "&name=Keep+category&image=&active=on");
+      assertSafeError(category, 400);
+      assertTrue(category.body().contains("Keep category"));
+      assertTrue(category.body().contains("name=\"id\" value=\"" + invalid + "\""));
+      var product =
+          post(
+              "/admin/product/save",
+              "_csrf="
+                  + token
+                  + "&categoryId="
+                  + invalid
+                  + "&title=Keep+title&author=Writer&price=100&stock=1&image=");
+      assertSafeError(product, 400);
+      assertTrue(product.body().contains("Keep title"));
+      assertSafeError(
+          post(
+              "/admin/product/save",
+              "_csrf="
+                  + token
+                  + "&id="
+                  + invalid
+                  + "&categoryId=1&title=Book&author=Writer&price=100&stock=1&image="),
+          400);
+    }
+    assertSafeError(
+        post(
+            "/admin/product/save",
+            "_csrf="
+                + token
+                + "&categoryId=&title=Keep+title&author=Writer&price=100&stock=1&image="),
+        400);
+    assertTrue(get("/product").body().contains("13 cuốn sách"));
+  }
+
+  @Test
+  void publicOtpResponsesDoNotRevealSmtpFailure() throws Exception {
+    mail.fail = true;
+    String token = csrf("/auth/forgot");
+    var existing = post("/auth/forgot", "_csrf=" + token + "&email=reader%40example.test");
+    String existingNotice = get("/auth/reset").body();
+    var missing = post("/auth/forgot", "_csrf=" + token + "&email=nobody%40example.test");
+    String missingNotice = get("/auth/reset").body();
+    assertEquals(302, existing.statusCode(), existing.body());
+    assertEquals(existing.statusCode(), missing.statusCode());
+    assertEquals(
+        existing.headers().firstValue("location"), missing.headers().firstValue("location"));
+    for (String body : List.of(existingNotice, missingNotice)) {
+      assertTrue(body.contains(OtpService.SENT_MESSAGE));
+      assertFalse(body.contains("Chưa gửi được email"));
+    }
+    var registered =
+        post(
+            "/auth/register",
+            "_csrf="
+                + token
+                + "&username=pending&email=pending%40example.test&password=test-password-123&confirm=test-password-123");
+    assertEquals(503, registered.statusCode());
+    clock.now = clock.now.plusSeconds(61);
+    for (String address : List.of("pending", "nobody", "reader")) {
+      var resend = post("/auth/resend", "_csrf=" + token + "&email=" + address + "%40example.test");
+      assertEquals(200, resend.statusCode(), resend.body());
+      assertTrue(resend.body().contains(OtpService.SENT_MESSAGE));
+    }
+  }
+
+  @Test
+  void unexpectedAndHttpErrorsUseSafeBrandedPage() throws Exception {
+    var unexpected = get("/_test/failure");
+    assertSafeError(unexpected, 500);
+    assertTrue(unexpected.body().contains("Về trang chủ"));
+    for (int status : List.of(400, 403, 404, 405, 413, 429, 500, 503)) {
+      var response = get("/_test/failure?status=" + status);
+      assertSafeError(response, status);
+      assertTrue(response.body().contains("Về trang chủ"));
+      assertTrue(response.body().contains("/bookstore/assets/app.css"));
+      assertEquals("no-store", response.headers().firstValue("cache-control").orElseThrow());
+    }
+    assertSafeError(get("/does-not-exist"), 404);
+    assertSafeError(get("/error"), 404);
+  }
+
+  HttpResponse<String> upload(String route, Map<String, String> fields, byte[] file)
+      throws Exception {
+    String boundary = "BookstoreTestBoundary";
+    var body = new java.io.ByteArrayOutputStream();
+    for (var field : fields.entrySet()) {
+      body.write(
+          ("--"
+                  + boundary
+                  + "\r\nContent-Disposition: form-data; name=\""
+                  + field.getKey()
+                  + "\"\r\n\r\n"
+                  + field.getValue()
+                  + "\r\n")
+              .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    }
+    body.write(
+        ("--"
+                + boundary
+                + "\r\n"
+                + "Content-Disposition: form-data; name=\"upload\"; filename=\"test.png\"\r\n"
+                + "Content-Type: image/png\r\n\r\n")
+            .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    body.write(file);
+    body.write(("\r\n--" + boundary + "--\r\n").getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    return client.send(
+        HttpRequest.newBuilder(URI.create(base + route))
+            .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+            .POST(HttpRequest.BodyPublishers.ofByteArray(body.toByteArray()))
+            .build(),
+        HttpResponse.BodyHandlers.ofString());
+  }
+
+  @Test
+  void multipartUploadOverridesUrlAndRejectsInvalidFiles() throws Exception {
+    assertEquals(
+        302,
+        post(
+                "/auth/login",
+                "_csrf="
+                    + csrf("/auth/login")
+                    + "&login=admin&password=demo-password-123&mode=session")
+            .statusCode());
+    var fields =
+        new HashMap<>(
+            Map.of(
+                "_csrf",
+                csrf("/admin/product/add"),
+                "categoryId",
+                "1",
+                "title",
+                "Uploaded book",
+                "author",
+                "Writer",
+                "price",
+                "100",
+                "stock",
+                "1",
+                "image",
+                "invalid-url"));
+    var png = new java.io.ByteArrayOutputStream();
+    javax.imageio.ImageIO.write(
+        new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB),
+        "png",
+        png);
+    var created = upload("/admin/product/save", fields, png.toByteArray());
+    assertEquals(302, created.statusCode(), created.body());
+    var detail = get("/product/detail?id=14");
+    var media =
+        java.util.regex.Pattern.compile("/bookstore(/media/[a-f0-9-]{36}\\.png)")
+            .matcher(detail.body());
+    assertTrue(media.find(), detail.body());
+    assertEquals(200, get(media.group(1)).statusCode());
+    assertSafeError(upload("/admin/product/save", fields, new byte[] {1, 2, 3}), 400);
+    var tooLarge = upload("/admin/product/save", fields, new byte[5 * 1024 * 1024 + 1]);
+    assertSafeError(tooLarge, 413);
+    assertTrue(tooLarge.body().contains("Về trang chủ"));
   }
 
   @Test

@@ -63,9 +63,18 @@ public final class SecurityFilter implements Filter {
     if (!"GET".equals(req.getMethod()) && !"HEAD".equals(req.getMethod())) {
       String provided;
       try {
+        if (req.getContentType() != null
+            && req.getContentType()
+                .toLowerCase(java.util.Locale.ROOT)
+                .startsWith("multipart/form-data")) {
+          req.getParts();
+        }
         provided = req.getParameter("_csrf");
       } catch (IllegalStateException e) {
         res.sendError(413, "Tệp tải lên quá lớn.");
+        return;
+      } catch (ServletException e) {
+        res.sendError(400, "Biểu mẫu tải ảnh không hợp lệ.");
         return;
       }
       if (provided == null

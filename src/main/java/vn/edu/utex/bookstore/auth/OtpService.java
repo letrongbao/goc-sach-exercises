@@ -119,10 +119,7 @@ public final class OtpService {
             }
             return null;
           });
-      throw new Problem(
-          503,
-          "Chưa gửi được email. Nếu vừa đăng ký, tài khoản vẫn đang chờ kích hoạt. Hãy gửi lại sau"
-              + " 60 giây.");
+      throw new OtpDeliveryFailure();
     }
   }
 
