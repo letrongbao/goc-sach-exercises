@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = [IO.Path]::GetFullPath((Split-Path $PSScriptRoot -Parent))
 $exportRoot = Join-Path $projectRoot 'submissions'
 $archiveRoot = Join-Path $projectRoot '.tools'
-$milestones = @{'submission-01-r1'='Bai_01_Servlet_JDBC'; 'submission-02-r1'='Bai_02_Servlet_JPA'; 'submission-03'='Bai_03_OTP_Product'}
+$milestones = @{'submission-01'='Bai_01_Servlet_JDBC'; 'submission-02'='Bai_02_Servlet_JPA'; 'submission-03'='Bai_03_OTP_Product'}
 Push-Location $projectRoot
 try {
     New-Item -ItemType Directory -Path $exportRoot,$archiveRoot -Force | Out-Null

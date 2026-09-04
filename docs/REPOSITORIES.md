@@ -10,4 +10,6 @@ Thư mục trên máy:
 - Bài tập: `C:/BaoLT/spring_boot`
 - Đồ án: `C:/BaoLT/goc-sach`
 
-Không dùng link đồ án để nộp Bài 03. Các phiên bản source đã chốt được giữ nguyên.
+Không dùng link đồ án để nộp Bài 03. Repo bài tập dùng ba tag chính: `submission-01`, `submission-02`, `submission-03`.
+
+Ngày 04/09/2026, theo yêu cầu chủ repo, ba tag được cập nhật sang bản mới nhất tương ứng và bỏ các tag sửa đổi `-r…`. Lịch sử commit vẫn được giữ.
