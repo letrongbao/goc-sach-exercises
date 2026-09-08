@@ -43,11 +43,30 @@ public final class Web {
   public static void view(HttpServletRequest req, HttpServletResponse res, String view)
       throws ServletException, IOException {
     req.setAttribute("view", view);
-    req.getRequestDispatcher("/WEB-INF/views/layout.jsp").forward(req, res);
+    req.setAttribute("pageTitle", title(view));
+    req.getRequestDispatcher("/WEB-INF/views/content.jsp").forward(req, res);
   }
 
   public static void redirect(HttpServletRequest req, HttpServletResponse res, String route)
       throws IOException {
     res.sendRedirect(req.getContextPath() + route);
+  }
+
+  private static String title(String view) {
+    return switch (view) {
+      case "catalog-home" -> "Trang chủ";
+      case "products" -> "Tủ sách";
+      case "product-detail" -> "Chi tiết sách";
+      case "product-form" -> "Quản lý sách";
+      case "categories" -> "Danh mục";
+      case "category-form" -> "Quản lý danh mục";
+      case "login" -> "Đăng nhập";
+      case "register" -> "Đăng ký";
+      case "activate" -> "Kích hoạt tài khoản";
+      case "forgot" -> "Quên mật khẩu";
+      case "reset" -> "Đặt lại mật khẩu";
+      case "profile" -> "Hồ sơ cá nhân";
+      default -> "Thông báo";
+    };
   }
 }

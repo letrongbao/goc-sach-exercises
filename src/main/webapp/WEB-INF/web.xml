@@ -9,7 +9,9 @@
   <servlet-mapping><servlet-name>product</servlet-name><url-pattern>/product</url-pattern><url-pattern>/product/detail</url-pattern><url-pattern>/admin/products</url-pattern><url-pattern>/admin/product/add</url-pattern><url-pattern>/admin/product/edit</url-pattern><url-pattern>/admin/product/save</url-pattern><url-pattern>/admin/product/delete</url-pattern></servlet-mapping>
   <listener><listener-class>vn.edu.utex.bookstore.web.Bootstrap</listener-class></listener>
   <filter><filter-name>security</filter-name><filter-class>vn.edu.utex.bookstore.web.SecurityFilter</filter-class></filter>
+  <filter><filter-name>sitemesh</filter-name><filter-class>org.sitemesh.config.ConfigurableSiteMeshFilter</filter-class></filter>
   <filter-mapping><filter-name>security</filter-name><url-pattern>/*</url-pattern></filter-mapping>
+  <filter-mapping><filter-name>sitemesh</filter-name><url-pattern>/*</url-pattern><dispatcher>REQUEST</dispatcher></filter-mapping>
   <servlet><servlet-name>front</servlet-name><servlet-class>vn.edu.utex.bookstore.web.FrontServlet</servlet-class>
     <multipart-config><max-file-size>5242880</max-file-size><max-request-size>6291456</max-request-size><file-size-threshold>1048576</file-size-threshold></multipart-config>
   </servlet>
