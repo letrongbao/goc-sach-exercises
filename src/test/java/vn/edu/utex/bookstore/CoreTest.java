@@ -101,6 +101,19 @@ class CoreTest {
     assertThrows(Problem.class, () -> service.get(9));
   }
 
+  @Test
+  void profileValidationAndUpdate() {
+    ProfileService profiles = new ProfileService(store);
+    ProfileService.Input input = profiles.validate("  Lê   Trọng Bảo  ", "090-123-4567");
+    profiles.update(user.id, input, "/media/12345678-1234-1234-1234-123456789abc.png");
+    ProfileView profile = profiles.get(user.id);
+    assertEquals("Lê Trọng Bảo", profile.fullName());
+    assertEquals("0901234567", profile.phone());
+    assertTrue(profile.image().endsWith(".png"));
+    assertThrows(Problem.class, () -> profiles.validate(" ", "0901234567"));
+    assertThrows(Problem.class, () -> profiles.validate("Người dùng", "123"));
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"0", "-1", "abc", "999999999999999999999"})
   void invalidId(String raw) {

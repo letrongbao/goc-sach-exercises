@@ -6,6 +6,9 @@
     <basic name="email"><column name="email" length="254" nullable="false" unique="true"/></basic>
     <basic name="passwordHash"><column name="password_hash" length="100" nullable="false"/></basic>
     <basic name="role"><column name="role" length="20" nullable="false"/></basic>
+    <basic name="fullName"><column name="full_name" length="100" nullable="false"/></basic>
+    <basic name="phone"><column name="phone" length="13" nullable="false"/></basic>
+    <basic name="image"><column name="image" length="1000" nullable="false"/></basic>
     <basic name="active"><column name="active" nullable="false"/></basic>
     <basic name="authVersion"><column name="auth_version" nullable="false"/></basic>
     <basic name="createdAt"><column name="created_at" nullable="false"/></basic>

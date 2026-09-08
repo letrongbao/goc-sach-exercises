@@ -27,6 +27,7 @@ public final class FrontServlet extends HttpServlet {
     App app = (App) getServletContext().getAttribute("app");
     String path = req.getServletPath() + (req.getPathInfo() == null ? "" : req.getPathInfo());
     if (path.isEmpty()) path = "/";
+    Identity identity = (Identity) req.getAttribute("identity");
     try {
       if (path.startsWith("/media/")) {
         if (post) throw new Problem(405, "Phương thức không hợp lệ.");
@@ -64,6 +65,20 @@ public final class FrontServlet extends HttpServlet {
         req.getSession().invalidate();
         SecurityFilter.cookie(req, res, null, app.settings.secureCookies());
         Web.redirect(req, res, "/");
+        return;
+      }
+      if (path.equals("/auth/profile")) {
+        if (identity == null) throw new Problem(401, "Bạn cần đăng nhập để xem hồ sơ.");
+        if (!post) {
+          req.setAttribute("profile", app.profiles.get(identity.id()));
+          Web.view(req, res, "profile");
+          return;
+        }
+        ProfileService.Input input =
+            app.profiles.validate(req.getParameter("fullName"), req.getParameter("phone"));
+        app.profiles.update(identity.id(), input, image(req, app));
+        req.getSession().setAttribute("notice", "Đã cập nhật hồ sơ.");
+        Web.redirect(req, res, "/auth/profile");
         return;
       }
       if (path.equals("/admin/categories") && !post) {
@@ -104,6 +119,18 @@ public final class FrontServlet extends HttpServlet {
       res.setStatus(e.status);
       req.setAttribute("error", e.getMessage());
       if (post && path.equals("/auth/login")) Web.view(req, res, "login");
+      else if (post && path.equals("/auth/profile") && identity != null) {
+        ProfileView current = app.profiles.get(identity.id());
+        Map<String, Object> form = new HashMap<>();
+        form.put("id", current.id());
+        form.put("username", current.username());
+        form.put("email", current.email());
+        form.put("fullName", Objects.toString(req.getParameter("fullName"), ""));
+        form.put("phone", Objects.toString(req.getParameter("phone"), ""));
+        form.put("image", Objects.toString(req.getParameter("image"), current.image()));
+        req.setAttribute("profile", form);
+        Web.view(req, res, "profile");
+      }
       else if (post && path.equals("/admin/category/save")) {
         Map<String, Object> form = new HashMap<>();
         for (String key : List.of("id", "name", "image"))

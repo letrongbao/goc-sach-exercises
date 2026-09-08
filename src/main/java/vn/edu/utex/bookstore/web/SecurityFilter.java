@@ -85,12 +85,12 @@ public final class SecurityFilter implements Filter {
         return;
       }
     }
-    if (path.startsWith("/admin/")) {
+    if (path.startsWith("/admin/") || path.equals("/auth/profile")) {
       if (identity == null) {
         res.sendRedirect(req.getContextPath() + "/auth/login");
         return;
       }
-      if (!identity.isAdmin()) {
+      if (path.startsWith("/admin/") && !identity.isAdmin()) {
         res.sendError(403);
         return;
       }

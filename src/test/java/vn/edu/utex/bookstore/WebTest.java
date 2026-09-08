@@ -97,6 +97,9 @@ class WebTest {
     var home = get("/");
     assertEquals(200, home.statusCode(), home.body());
     assertTrue(home.body().contains("góc"));
+    assertTrue(home.body().contains("<title>Trang chủ · Góc Sách</title>"));
+    assertEquals(1, java.util.regex.Pattern.compile("class=\"topline\"").matcher(home.body()).results().count());
+    assertFalse(home.body().contains("sitemesh:write"));
     var login = get("/auth/login");
     assertEquals(200, login.statusCode(), login.body());
     var matcher =
@@ -392,6 +395,54 @@ class WebTest {
                     + csrf("/auth/login")
                     + "&login=webreader&password=changed-password-123&mode=cookie")
             .statusCode());
+  }
+
+  @Test
+  void authenticatedUserUpdatesProfileWithMultipartImage() throws Exception {
+    assertEquals(302, get("/auth/profile").statusCode());
+    assertEquals(
+        302,
+        post(
+                "/auth/login",
+                "_csrf="
+                    + csrf("/auth/login")
+                    + "&login=reader&password=demo-password-123&mode=session")
+            .statusCode());
+    var profile = get("/auth/profile");
+    assertEquals(200, profile.statusCode(), profile.body());
+    assertTrue(profile.body().contains("Hồ sơ cá nhân"));
+    assertTrue(profile.body().contains("reader@example.test"));
+    assertSafeError(
+        post(
+            "/auth/profile",
+            "_csrf=" + csrf("/auth/profile") + "&fullName=X&phone=abc&image="),
+        400);
+
+    var png = new java.io.ByteArrayOutputStream();
+    javax.imageio.ImageIO.write(
+        new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB),
+        "png",
+        png);
+    var fields =
+        Map.of(
+            "_csrf",
+            csrf("/auth/profile"),
+            "fullName",
+            "Le Trong Bao",
+            "phone",
+            "0901234567",
+            "image",
+            "");
+    var updated = upload("/auth/profile", fields, png.toByteArray());
+    assertEquals(302, updated.statusCode(), updated.body());
+    var saved = get("/auth/profile");
+    assertTrue(saved.body().contains("Le Trong Bao"));
+    assertTrue(saved.body().contains("0901234567"));
+    var media =
+        java.util.regex.Pattern.compile("/bookstore(/media/[a-f0-9-]{36}\\.png)")
+            .matcher(saved.body());
+    assertTrue(media.find(), saved.body());
+    assertEquals(200, get(media.group(1)).statusCode());
   }
 
   @Test

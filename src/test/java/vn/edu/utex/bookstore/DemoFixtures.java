@@ -15,6 +15,8 @@ public final class DemoFixtures {
       u.email = u.username + "@example.test";
       u.passwordHash = passwords.hash("demo-password-123");
       u.role = role;
+      u.fullName = role.equals("ADMIN") ? "Quản trị Góc Sách" : "Bạn đọc Góc Sách";
+      u.phone = role.equals("ADMIN") ? "0900000001" : "0900000002";
       u.active = true;
       u.createdAt = Instant.now();
       store.saveUser(u);
