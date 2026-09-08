@@ -19,7 +19,10 @@ public class AuthService {
   }
 
   public Identity login(String login, String password) {
-    User user = store.tx(d -> d.findLogin(normalize(login)));
+    String normalized = normalize(login);
+    if (normalized.isEmpty() || normalized.length() > 254)
+      throw Problem.invalid("Tên đăng nhập hoặc email không hợp lệ.");
+    User user = store.tx(d -> d.findLogin(normalized));
     boolean valid = passwords.matches(password, user == null ? dummyHash : user.passwordHash);
     if (user == null || !valid || !user.active)
       throw new Problem(401, "Thông tin đăng nhập không đúng hoặc tài khoản chưa kích hoạt.");

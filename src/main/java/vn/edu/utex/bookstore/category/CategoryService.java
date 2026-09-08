@@ -12,7 +12,9 @@ public class CategoryService {
   }
 
   public List<Category> list(String query) {
-    return store.tx(d -> d.categories(query == null ? "" : query.trim()));
+    String normalized = query == null ? "" : query.trim();
+    if (normalized.length() > 100) throw Problem.invalid("Từ khóa tìm kiếm tối đa 100 ký tự.");
+    return store.tx(d -> d.categories(normalized));
   }
 
   public Category get(long id) {
