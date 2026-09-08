@@ -16,7 +16,7 @@ public final class Settings {
     String path = System.getProperty("bookstore.config", System.getenv("BOOKSTORE_CONFIG"));
     if (path == null || path.isBlank())
       throw new IllegalStateException(
-          "Thiếu bookstore.config / BOOKSTORE_CONFIG. Đọc docs/SETUP.md.");
+          "Thiếu bookstore.config / BOOKSTORE_CONFIG. Xem README.md.");
     try (var input = Files.newInputStream(Path.of(path))) {
       values.load(new InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8));
     } catch (IOException e) {

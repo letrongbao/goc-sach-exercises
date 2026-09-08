@@ -1,23 +1,24 @@
 # Bài tập Lập trình Web
 
 Sinh viên: Lê Trọng Bảo
+
 MSSV: 22110106
-Đề tài: Website bán sách.
 
-## Bài 03
+Đề tài: Website bán sách Góc Sách.
 
-Phát triển tiếp Bài 02, gồm:
+## Nội dung
 
-- Đăng ký, kích hoạt tài khoản và quên mật khẩu bằng OTP qua email.
-- Đăng nhập và quản lý danh mục, sản phẩm.
-- Trang chủ hiển thị 10 sách mới nhất.
-- Trang `/product` hiển thị 6 sách mỗi trang.
-- Xem chi tiết sách từ trang chủ và danh sách.
+- Bài 01: đăng nhập Session/Cookie và quản lý danh mục bằng JDBC.
+- Bài 02: chuyển phần lưu dữ liệu sang JPA.
+- Bài 03: OTP qua email, quản lý sách, trang chủ và phân trang.
+- Bài 04: SiteMesh 3 với Bootstrap, validation các form và cập nhật hồ sơ có tải ảnh.
 
-Bài làm sử dụng Java, JSP và JPA với PostgreSQL.
+## Cách chạy
 
-## Tài liệu
+Yêu cầu Java 21, PostgreSQL và Tomcat 10.1.
 
-- [Cách chạy](docs/SETUP.md)
-- [Cách điền cấu hình](docs/CAU_HINH.md)
-- [Kết quả kiểm tra](docs/VERIFICATION.md)
+1. Sao chép `config/local.example.properties` thành `config/local.properties` và điền cấu hình máy.
+2. Database mới dùng `sql/schema.sql`. Database Bài 03 dùng `sql/upgrade-03-to-04.sql`.
+3. Chạy `mvnw.cmd clean verify`, sau đó deploy `target/bookstore.war` lên Tomcat.
+
+Không đưa mật khẩu hoặc file `config/local.properties` lên GitHub. Các bản nộp được đánh dấu bằng tag `submission-01` đến `submission-04`.
