@@ -82,7 +82,7 @@ public final class FrontServlet extends HttpServlet {
         return;
       }
       if (path.equals("/admin/categories") && !post) {
-        req.setAttribute("categories", app.categories.list(req.getParameter("q")));
+        req.setAttribute("catalog", app.categories.page(req.getParameter("q"), req.getParameter("page")));
         Web.view(req, res, "categories");
         return;
       }
@@ -93,6 +93,30 @@ public final class FrontServlet extends HttpServlet {
                 ? app.categories.get(Web.id(req.getParameter("id")))
                 : new Category());
         Web.view(req, res, "category-form");
+        return;
+      }
+      if (path.equals("/admin/users") && !post) {
+        req.setAttribute("catalog", app.users.page(req.getParameter("q"), req.getParameter("page")));
+        Web.view(req, res, "users");
+        return;
+      }
+      if ((path.equals("/admin/user/add") || path.equals("/admin/user/edit")) && !post) {
+        req.setAttribute("user", path.endsWith("/edit")
+            ? app.users.get(Web.id(req.getParameter("id"))) : new HashMap<>());
+        Web.view(req, res, "user-form");
+        return;
+      }
+      if (path.equals("/admin/user/save") && post) {
+        Long id = Web.formId(req.getParameter("id"), false);
+        app.users.save(id, req.getParameter("username"), req.getParameter("email"),
+            req.getParameter("password"), req.getParameter("role"), req.getParameter("fullName"),
+            req.getParameter("phone"), req.getParameter("image"), "on".equals(req.getParameter("active")));
+        Web.redirect(req, res, "/admin/users");
+        return;
+      }
+      if (path.equals("/admin/user/delete") && post) {
+        app.users.delete(Web.formId(req.getParameter("id"), true), identity.id());
+        Web.redirect(req, res, "/admin/users");
         return;
       }
       if (path.equals("/admin/category/save") && post) {
@@ -138,6 +162,13 @@ public final class FrontServlet extends HttpServlet {
         form.put("active", "on".equals(req.getParameter("active")));
         req.setAttribute("category", form);
         Web.view(req, res, "category-form");
+      } else if (post && path.equals("/admin/user/save")) {
+        Map<String, Object> form = new HashMap<>();
+        for (String key : List.of("id", "username", "email", "role", "fullName", "phone", "image"))
+          form.put(key, Objects.toString(req.getParameter(key), ""));
+        form.put("active", "on".equals(req.getParameter("active")));
+        req.setAttribute("user", form);
+        Web.view(req, res, "user-form");
       } else Web.view(req, res, "error");
     } catch (IllegalStateException e) {
       getServletContext().log("Request failed", e);

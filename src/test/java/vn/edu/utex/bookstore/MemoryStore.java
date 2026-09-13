@@ -23,6 +23,21 @@ public class MemoryStore implements Store, Store.Data {
     return users.get(id);
   }
 
+  public List<User> users(String q, int offset, int limit) {
+    return users.values().stream()
+        .filter(u -> u.username.toLowerCase().contains(q.toLowerCase())
+            || u.email.toLowerCase().contains(q.toLowerCase())
+            || u.fullName.toLowerCase().contains(q.toLowerCase()))
+        .sorted(Comparator.comparing((User u) -> u.id).reversed())
+        .skip(offset)
+        .limit(limit)
+        .toList();
+  }
+
+  public long userCount(String q) {
+    return users(q, 0, Integer.MAX_VALUE).size();
+  }
+
   public User lockUser(long id) {
     return users.get(id);
   }
@@ -40,6 +55,10 @@ public class MemoryStore implements Store, Store.Data {
     return u;
   }
 
+  public void deleteUser(long id) {
+    users.remove(id);
+  }
+
   public Category category(long id) {
     return categories.get(id);
   }
@@ -49,6 +68,14 @@ public class MemoryStore implements Store, Store.Data {
         .filter(c -> c.name.toLowerCase().contains(q.toLowerCase()))
         .sorted(Comparator.comparing((Category c) -> c.id).reversed())
         .toList();
+  }
+
+  public List<Category> categories(String q, int offset, int limit) {
+    return categories(q).stream().skip(offset).limit(limit).toList();
+  }
+
+  public long categoryCount(String q) {
+    return categories(q).size();
   }
 
   public Category saveCategory(Category c) {

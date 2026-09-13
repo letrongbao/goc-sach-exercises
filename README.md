@@ -12,6 +12,7 @@ MSSV: 22110106
 - Bài 02: chuyển phần lưu dữ liệu sang JPA.
 - Bài 03: OTP qua email, quản lý sách, trang chủ và phân trang.
 - Bài 04: SiteMesh 3 với Bootstrap, validation các form và cập nhật hồ sơ có tải ảnh.
+- Bài 05: hoàn thiện CRUD Category/User trong khu vực admin, tìm kiếm và phân trang.
 
 ## Cách chạy
 
@@ -21,4 +22,4 @@ Yêu cầu Java 21, PostgreSQL và Tomcat 10.1.
 2. Database mới dùng `sql/schema.sql`. Database Bài 03 dùng `sql/upgrade-03-to-04.sql`.
 3. Chạy `mvnw.cmd clean verify`, sau đó deploy `target/bookstore.war` lên Tomcat.
 
-Không đưa mật khẩu hoặc file `config/local.properties` lên GitHub. Các bản nộp được đánh dấu bằng tag `submission-01` đến `submission-04`.
+Không đưa mật khẩu hoặc file `config/local.properties` lên GitHub. Các bản nộp được đánh dấu bằng tag `submission-01` đến `submission-05`.

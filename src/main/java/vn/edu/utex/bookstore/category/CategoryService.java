@@ -7,6 +7,13 @@ import vn.edu.utex.bookstore.persistence.Store;
 public class CategoryService {
   private final Store store;
 
+  public record Page(List<Category> items, int number, int pages, long total) {
+    public List<Category> getItems() { return items; }
+    public int getNumber() { return number; }
+    public int getPages() { return pages; }
+    public long getTotal() { return total; }
+  }
+
   public CategoryService(Store store) {
     this.store = store;
   }
@@ -15,6 +22,18 @@ public class CategoryService {
     String normalized = query == null ? "" : query.trim();
     if (normalized.length() > 100) throw Problem.invalid("Từ khóa tìm kiếm tối đa 100 ký tự.");
     return store.tx(d -> d.categories(normalized));
+  }
+
+  public Page page(String query, String rawPage) {
+    String normalized = query == null ? "" : query.trim();
+    if (normalized.length() > 100) throw Problem.invalid("Từ khóa tìm kiếm tối đa 100 ký tự.");
+    int number = pageNumber(rawPage);
+    return store.tx(d -> {
+      long total = d.categoryCount(normalized);
+      int pages = (int) Math.max(1, (total + 5) / 6);
+      if (number > pages) throw Problem.missing();
+      return new Page(d.categories(normalized, (number - 1) * 6, 6), number, pages, total);
+    });
   }
 
   public Category get(long id) {
@@ -50,5 +69,15 @@ public class CategoryService {
           d.deleteCategory(id);
           return null;
         });
+  }
+
+  private static int pageNumber(String raw) {
+    try {
+      int number = raw == null || raw.isBlank() ? 1 : Integer.parseInt(raw);
+      if (number < 1) throw Problem.invalid("Số trang phải là số nguyên dương.");
+      return number;
+    } catch (NumberFormatException e) {
+      throw Problem.invalid("Số trang không hợp lệ.");
+    }
   }
 }
