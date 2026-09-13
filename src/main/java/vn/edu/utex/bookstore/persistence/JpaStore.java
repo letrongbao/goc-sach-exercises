@@ -67,24 +67,6 @@ public class JpaStore implements Store {
       return em.find(User.class, id);
     }
 
-    public List<User> users(String query, int offset, int limit) {
-      return em.createQuery(
-              "select u from User u where locate(:q, lower(u.username)) > 0 or locate(:q, lower(u.email)) > 0 or locate(:q, lower(u.fullName)) > 0 order by u.id desc",
-              User.class)
-          .setParameter("q", query.toLowerCase(Locale.ROOT))
-          .setFirstResult(offset)
-          .setMaxResults(limit)
-          .getResultList();
-    }
-
-    public long userCount(String query) {
-      return em.createQuery(
-              "select count(u) from User u where locate(:q, lower(u.username)) > 0 or locate(:q, lower(u.email)) > 0 or locate(:q, lower(u.fullName)) > 0",
-              Long.class)
-          .setParameter("q", query.toLowerCase(Locale.ROOT))
-          .getSingleResult();
-    }
-
     public User lockUser(long id) {
       return em.find(User.class, id, LockModeType.PESSIMISTIC_WRITE);
     }
@@ -106,11 +88,6 @@ public class JpaStore implements Store {
       return em.merge(u);
     }
 
-    public void deleteUser(long id) {
-      User user = user(id);
-      if (user != null) em.remove(user);
-    }
-
     public Category category(long id) {
       return em.find(Category.class, id);
     }
@@ -122,23 +99,6 @@ public class JpaStore implements Store {
           .setParameter("q", query.toLowerCase(Locale.ROOT))
           .getResultList();
     }
-
-            public List<Category> categories(String query, int offset, int limit) {
-          return em.createQuery(
-              "select c from Category c where locate(:q, lower(c.name)) > 0 order by c.id desc",
-              Category.class)
-              .setParameter("q", query.toLowerCase(Locale.ROOT))
-              .setFirstResult(offset)
-              .setMaxResults(limit)
-              .getResultList();
-            }
-
-            public long categoryCount(String query) {
-          return em.createQuery(
-              "select count(c) from Category c where locate(:q, lower(c.name)) > 0", Long.class)
-              .setParameter("q", query.toLowerCase(Locale.ROOT))
-              .getSingleResult();
-            }
 
     public Category saveCategory(Category c) {
       if (c.id == null) {

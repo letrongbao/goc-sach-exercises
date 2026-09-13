@@ -12,7 +12,6 @@ public final class App implements AutoCloseable {
   public final Store store;
   public final AuthService auth;
   public final ProfileService profiles;
-  public final UserService users;
   public final CategoryService categories;
   public final LocalImageStorage images;
   public final RateLimiter limits;
@@ -29,7 +28,6 @@ public final class App implements AutoCloseable {
     this.store = store;
     this.auth = new AuthService(store, new Passwords(), clock);
     this.profiles = new ProfileService(store);
-    this.users = new UserService(store, new Passwords());
     this.categories = new CategoryService(store);
     this.images = new LocalImageStorage(Path.of(settings.require("uploads.dir")));
     this.limits = new RateLimiter(clock);

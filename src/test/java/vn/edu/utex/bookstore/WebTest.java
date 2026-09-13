@@ -485,28 +485,4 @@ class WebTest {
     assertEquals(302, post("/admin/product/delete", "_csrf=" + token + "&id=14").statusCode());
     assertEquals(404, get("/product/detail?id=14").statusCode());
   }
-
-  @Test
-  void adminCanManageUsersAndSearchPaginatedLists() throws Exception {
-    assertEquals(
-        302,
-        post(
-                "/auth/login",
-                "_csrf=" + csrf("/auth/login")
-                    + "&login=admin&password=demo-password-123&mode=session")
-            .statusCode());
-    assertEquals(200, get("/admin/users").statusCode());
-    assertEquals(200, get("/admin/categories?page=1").statusCode());
-    String token = csrf("/admin/user/add");
-    var created = post(
-        "/admin/user/save",
-        "_csrf=" + token
-            + "&username=managed&email=managed%40example.test&password=managed-password-123"
-            + "&role=USER&fullName=Managed+User&phone=0901234567&image=&active=on");
-    assertEquals(302, created.statusCode(), created.body());
-    assertTrue(get("/admin/users?q=managed").body().contains("managed@example.test"));
-    assertEquals(409, post("/admin/user/delete", "_csrf=" + token + "&id=1").statusCode());
-    assertEquals(302, post("/admin/user/delete", "_csrf=" + token + "&id=3").statusCode());
-    assertFalse(get("/admin/users?q=managed").body().contains("managed@example.test"));
-  }
 }

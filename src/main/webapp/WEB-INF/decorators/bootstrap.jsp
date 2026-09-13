@@ -20,7 +20,7 @@
   <nav aria-label="Điều hướng chính">
     <a href="<c:url value='/'/>">Trang chủ</a>
     <a href="<c:url value='/product'/>">Tủ sách</a>
-    <c:if test="${identity.admin}"><a href="<c:url value='/admin/categories'/>">Danh mục</a><a href="<c:url value='/admin/products'/>">Sản phẩm</a><a href="<c:url value='/admin/users'/>">Người dùng</a></c:if>
+    <c:if test="${identity.admin}"><a href="<c:url value='/admin/categories'/>">Danh mục</a><a href="<c:url value='/admin/products'/>">Sản phẩm</a></c:if>
   </nav>
   <div class="account">
     <c:choose>

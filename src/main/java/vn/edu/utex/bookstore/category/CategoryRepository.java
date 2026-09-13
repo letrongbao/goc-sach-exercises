@@ -7,10 +7,6 @@ public interface CategoryRepository {
 
   List<Category> categories(String query);
 
-  List<Category> categories(String query, int offset, int limit);
-
-  long categoryCount(String query);
-
   Category saveCategory(Category category);
 
   void deleteCategory(long id);
